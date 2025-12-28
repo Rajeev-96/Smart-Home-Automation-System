@@ -1,0 +1,52 @@
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+
+const char* ssid = "YOUR_WIFI_NAME";
+const char* password = "YOUR_WIFI_PASSWORD";
+const char* serverURL = "http://YOUR_SERVER_IP:3000/status";
+
+int relayLight = D1;
+int relayFan = D2;
+
+void setup() {
+  Serial.begin(9600);
+
+  pinMode(relayLight, OUTPUT);
+  pinMode(relayFan, OUTPUT);
+
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("\nWiFi Connected");
+}
+
+void loop() {
+  if (WiFi.status() == WL_CONNECTED) {
+    HTTPClient http;
+    WiFiClient client;
+
+    http.begin(client, serverURL);
+    int httpCode = http.GET();
+
+    if (httpCode == 200) {
+      String payload = http.getString();
+
+      if (payload.indexOf("\"light\":\"ON\"") > 0)
+        digitalWrite(relayLight, LOW);
+      else
+        digitalWrite(relayLight, HIGH);
+
+      if (payload.indexOf("\"fan\":\"ON\"") > 0)
+        digitalWrite(relayFan, LOW);
+      else
+        digitalWrite(relayFan, HIGH);
+    }
+    http.end();
+  }
+  delay(2000);
+}
