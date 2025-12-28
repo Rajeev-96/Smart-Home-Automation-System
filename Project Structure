@@ -1,0 +1,16 @@
+Smart-Home-Automation/
+│
+├── public/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+│
+├── server/
+│   ├── app.js
+│   └── routes.js
+│
+├── hardware/
+│   └── esp8266_code.ino
+│
+├── README.md
+└── package.json
