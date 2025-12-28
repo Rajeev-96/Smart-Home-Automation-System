@@ -1,0 +1,35 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+
+const app = express();
+const PORT = 3000;
+
+let deviceState = {
+  light: "OFF",
+  fan: "OFF"
+};
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static("public"));
+
+app.get("/status", (req, res) => {
+  res.json(deviceState);
+});
+
+app.post("/control", (req, res) => {
+  const { device, state } = req.body;
+
+  if (deviceState.hasOwnProperty(device)) {
+    deviceState[device] = state;
+    console.log(`${device} turned ${state}`);
+    res.json({ success: true, deviceState });
+  } else {
+    res.status(400).json({ success: false, message: "Invalid device" });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Smart Home Server running at http://localhost:${PORT}`);
+});
